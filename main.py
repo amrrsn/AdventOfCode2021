@@ -36,6 +36,12 @@ def Day2():
     return sub_depth * sub_horizontal
 
 
+def Day3():
+    with open("./puzzle_inputs/Day3.txt") as input_file:
+        pass
+
+
 if __name__ == '__main__':
     print(f"Day1: {Day1()}")
     print(f"Day2: {Day2()}")
+    print(f"Day3: {Day3()}")
