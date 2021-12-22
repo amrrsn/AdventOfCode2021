@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def remove_duplicates(input_list):
@@ -109,7 +110,7 @@ def Day3():
     return int(gamma_rate, 2) * int(epsilon_rate, 2), int(co2_rating, 2) * int(oxy_rating, 2)
 
 
-def Day13():
+def Day13() -> list[tuple[int, int]]:
     coords = []
     new_coords = []
     with open("./puzzle_inputs/Day13.txt") as input_file:
@@ -143,8 +144,86 @@ def Day13():
         return coords
 
 
+def Day14() -> int:
+    tmp_init = {}
+    rules = {}
+    single_characters = {}
+    pairs = {}
+    initial_polymer = ""
+    with open("./puzzle_inputs/Day14.txt") as input_file:
+        initial_polymer = input_file.readline().strip()
+        _ = input_file.readline()
+        for line in input_file:
+            line = line.strip()
+            tmp = line.split(" -> ")
+            # rules[tmp[0]] = tmp[1]
+            rules[tmp[0]] = (f"{tmp[0][0]}{tmp[1]}", f"{tmp[1]}{tmp[0][1]}")
+            single_characters[tmp[1]] = 0
+
+    for key1 in single_characters:
+        for key2 in single_characters:
+            new_key = f"{key1}{key2}"
+            pairs[new_key] = 0
+    tmp_init = pairs.copy()
+
+    # set up the initial polymer state
+    for char1, char2 in zip(initial_polymer, initial_polymer[1:]):
+        pair = f"{char1}{char2}"
+        if pair in pairs:
+            pairs[pair] += 1
+        else:
+            print("error")
+
+    # process the polymer
+    for i in range(40):
+        tmp = tmp_init.copy()
+        for pair in pairs:
+            rule1, rule2 = rules[pair]
+            tmp[rule1] += pairs[pair]
+            tmp[rule2] += pairs[pair]
+        pairs = tmp.copy()
+
+    # count the elements in the polymer
+    for key in pairs:
+        for char in key:
+            if char in single_characters:
+                single_characters[char] += pairs[key]
+            else:
+                print("error")
+
+    for key in single_characters:
+        single_characters[key] = (single_characters[key] // 2) + (single_characters[key] % 2)
+    counted = dict(Counter(single_characters))
+    max_item = counted[max(counted, key=counted.get)]
+    min_item = counted[min(counted, key=counted.get)]
+    return max_item - min_item
+
+
+# def getDiceRolls(roll_num: int) -> int:
+#     return (9 * roll_num) - 3
+#
+#
+# def Day21() -> int:
+#     player1_position = 0
+#     player1_points = 0
+#     player2_position = 0
+#     player2_points = 0
+#     with open("./puzzle_inputs/Day21.txt") as input_file:
+#         player1_position = int(input_file.readline().strip().split(" ")[-1])
+#         player2_position = int(input_file.readline().strip().split(" ")[-1])
+#
+#     num_rolls = 0
+#     while player1_points < 1000 and player2_points < 1000:
+#         dice_roll = getDiceRolls(num_rolls)
+#         if num_rolls % 2 == 0:
+#             player1_position += dice_roll
+#             # TODO: manage points and board
+#     pass
+
+
 if __name__ == '__main__':
     print(f"Day 1: {Day1()}")
     print(f"Day 2: {Day2()}")
     # print(f"Day 3: {Day3()}")
-    print(f"Day 13: {Day13()}")
+    # print(f"Day 13: {Day13()}")
+    print(f"Day 14: {Day14()}")
